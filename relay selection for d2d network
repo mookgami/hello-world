@@ -1,0 +1,126 @@
+clc
+close all
+clear all
+
+n=(10^(-114/10))/1000;
+q=4;
+p=(10^(20/10))/1000;
+w=1*10^6;
+
+theta = [0:2*pi/100:2*pi];
+factor = 0.5;
+R=1; a=-factor; b=factor;
+for R=1
+    X1 = R*cos(theta)+a;
+    Y1 = R*sin(theta);
+    X2 = R*cos(theta)+b;
+    Y2 = R*sin(theta);
+
+    D=b-a;
+    A=R^2*(2*acos(D^2/(2*D*R))-sin(2*acos(D^2/(2*R*D))));
+    %A=R^2*acos(R^2/(2*R*D))+D^2*acos((2*D^2-R^2)/(2*D^2))-1/2*sqrt(R^2*2*D*(2*D+R));
+    r=sqrt(A/pi);
+
+    XS=2*(linspace(-0.5,0.5,100))'*(R-D/2);
+    YS=sqrt(R^2-(D/2)^2)*2*(linspace(-0.5,0.5,100))';
+    XT=r*2*(linspace(-0.5,0.5,100))';
+    YT=r*2*(linspace(-0.5,0.5,100))';
+    [xs,ys]=meshgrid(XS,YS);
+    [xt,yt]=meshgrid(XT,YT);
+
+    X3 = r*cos(theta);
+    Y3 = r*sin(theta);
+
+     C1sum=0;
+     C1count=0;
+     C2sum=0;
+     C2count=0;
+        C3count=0;
+  
+      figure
+      plot(X1,Y1,X2,Y2,X3,Y3)
+
+    axis('equal')
+    hold on
+
+    for i=1:5000
+
+        x = xs(i);
+        y = ys(i);
+        r1=sqrt(y^2+(x-a)^2);
+        r2=sqrt(y^2+(x-b)^2);
+        C3count=C3count+1
+
+
+        if (r1<=R && r2<=R )
+
+            d1=D;
+            d2=sqrt((a-x).^2+y.^2);
+            d3=sqrt((b-x).^2+y.^2);
+            l1=(p* (d1.^-q) );
+            l2=(p* (d2.^-q) );
+            l3=(p* (d3.^-q) );
+            C1=w*min(log2(1+l2), log2(1+l3+l1));
+            C1sum=C1+C1sum;
+            C1count=C1count+1;
+
+          %plot(x,y,'x','color','blue')
+        end
+    end
+
+
+
+    axis('equal')
+    hold on
+    for i=1:5000
+
+        x = xt(i);
+        y = yt(i);
+        r1=sqrt(y^2+(x-a)^2);
+        r2=sqrt(y^2+(x-b)^2);
+        if (r>=sqrt(x^2+y^2) )
+
+            d1=D;
+            d2=sqrt((a-x).^2+y.^2);
+            d3=sqrt((b-x).^2+y.^2);
+            l1=(p* (d1.^-q) );
+            l2=(p* (d2.^-q) );
+            l3=(p* (d3.^-q) );
+            C2=w*min(log2(1+l2), log2(1+l3+l1));
+            C2sum=C2+C2sum;
+            C2count=C2count+1;
+           
+
+           %  plot(x,y,'o','color','red')
+        end
+
+    end
+    hold off
+if R==1
+    avgC11=C1sum/C1count;
+    avgC12=C2sum/C2count;
+end
+% if R==1.5
+%     avgC21=C1sum/C1count;
+%     avgC22=C2sum/C2count;
+% end
+% if R==2
+%     avgC31=C1sum/C1count;
+%     avgC32=C2sum/C2count;
+% end
+% if R==2.5
+%     avgC41=C1sum/C1count;
+%     avgC42=C2sum/C2count;
+% end
+% if R==3
+%      avgC51=C1sum/C1count;
+%     avgC52=C2sum/C2count;
+% end
+%  if R==4
+%      avgC61=C1sum/C1count;
+%      avgC62=C2sum/C2count;
+% end
+end
+ %  figure
+ % plot([1,1.5,2,2.5,3,4],[avgC11,avgC21,avgC31,avgC41,avgC51,avgC61],'-o'),
+ % hold on,plot([1,1.5,2,2.5,3,4],[avgC12,avgC22,avgC32,avgC42,avgC52,avgC62],'-x')
